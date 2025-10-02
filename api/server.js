@@ -18,10 +18,13 @@ const port = process.env.PORT || 3000;
 await connectDB();
 await connectCloudinary();
 
+//Allow multiple origins
+const allowedOrigins = ['http://localhost:5173', 'https://grocelio.vercel.app'];
+
 app.post('/stripe', express.raw({type: 'application/json'}), stripeWebhooks);
 
 // Middlwares
-app.use(cors({origin: 'http://localhost:5173', credentials: true}));
+app.use(cors({origin: allowedOrigins, credentials: true}));
 app.use(express.json());
 app.use(cookieParser());
 
