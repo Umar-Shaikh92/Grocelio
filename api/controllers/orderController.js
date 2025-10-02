@@ -178,6 +178,7 @@ export const stripeWebhooks = async (req, res) => {
   let event;
 
   try {
+    const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
     event = stripeInstance.webhooks.constructEvent(
       req.body,
       sig,
@@ -193,8 +194,14 @@ export const stripeWebhooks = async (req, res) => {
       const session = event.data.object;
       const { orderId, userId } = session.metadata;
 
-      await Order.findByIdAndUpdate(orderId, { isPaid: true });
-      await User.findByIdAndUpdate(userId, { cartItems: {} });
+      // await Order.findByIdAndUpdate(orderId, { isPaid: true });
+      const updated = await Order.findByIdAndUpdate(
+  orderId,
+  { isPaid: true },
+  { new: true }
+);
+await User.findByIdAndUpdate(userId, { cartItems: {} });
+console.log("Updated Order:", updated);
       console.log(`✅ Order ${orderId} marked as paid`);
       break;
     }
